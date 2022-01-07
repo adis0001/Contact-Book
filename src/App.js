@@ -1,23 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { useState } from "react";
+import ContactCard from "./components/ContactCard/ContactCard";
+import AddContact from "./components/AddContact/AddContact";
+import "./App.css";
+import ContactList from "./components/ContactList/ContactList";
 function App() {
+  const [contacts, setContacts] = useState([]);
+  const [show, setShow] = useState(false);
+  const [contactToEdit, setContactToEdit] = useState(null);
+
+  const saveEditedContact = (contact) => {
+    setContacts(
+      contacts.map((iterable) => {
+        if (iterable.id === contact.id) return contact;
+        else return iterable;
+      })
+    );
+  };
+  function addContact(newContact) {
+    setContacts([...contacts, newContact]);
+  }
+  function deleteContact(id) {
+    let contact = [...contacts];
+    contact = contact.filter((item) => {
+      return item.id !== id;
+    });
+    setContacts(contact);
+  }
+  const handleClose = () => {
+    setShow(false);
+    setContactToEdit(null);
+  };
+  const handleShow = () => setShow(true);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <AddContact addContact={addContact} />
+      {contactToEdit && (
+        <ContactCard
+          contacts={contacts}
+          handleClose={handleClose}
+          show={show}
+          contactToEdit={contactToEdit}
+          saveEditedContact={saveEditedContact}
+        />
+      )}
+      <ContactList
+        handleShow={handleShow}
+        contacts={contacts}
+        deleteContact={deleteContact}
+        setContactToEdit={setContactToEdit}
+      />
     </div>
   );
 }
